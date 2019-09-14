@@ -24,7 +24,7 @@ func init() {
 
 	gelf := os.Getenv("GELF_UDP")
 	if gelf != "" {
-		hook := graylog.NewAsyncGraylogHook(gelf, map[string]interface{}{"project": "spectacle"})
+		hook := graylog.NewAsyncGraylogHook(gelf, map[string]interface{}{"project": "myHive"})
 		logger.AddHook(hook)
 		logger.Info("Graylog registered")
 	}
@@ -61,7 +61,7 @@ func LocalLogger(entry *logrus.Entry, ctx *gin.Context) (logger *logrus.Entry) {
 	if ctx != nil {
 		logIdVal := ctx.Value("LogId")
 		if logIdStr, ok := logIdVal.(string); ok {
-			logger = logger.WithField("SPEC-Log-Id", logIdStr)
+			logger = logger.WithField("HIVE-Log-Id", logIdStr)
 		}
 	}
 	return logger
