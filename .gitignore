@@ -2,6 +2,3 @@
 *.iws
 *.ipr
 *.iml
-
-vendor/*
-!vendor/vendor.json
