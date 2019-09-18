@@ -6,8 +6,10 @@ require (
 	github.com/gemnasium/logrus-graylog-hook v2.0.7+incompatible
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
+	github.com/go-redis/redis v6.15.5+incompatible
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.10
+	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
