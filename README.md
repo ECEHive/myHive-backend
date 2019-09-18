@@ -6,3 +6,6 @@ The project is currently split into 3 sections
 - backend server application
 - web frontend for management and querying
 - electron app for inventory counter
+
+
+## Coding Tips

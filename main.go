@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/ECEHive/myHive-backend/db"
+	"github.com/ECEHive/myHive-backend/entity"
 	"github.com/ECEHive/myHive-backend/model"
 	"github.com/ECEHive/myHive-backend/util"
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,8 @@ func main() {
 	}
 	// Connect to DB
 	_ = db.GetDB()
+	// DB: Migrate Entities
+	entity.MigrateEntities()
 
 	// Gin Setup
 	r := gin.New()

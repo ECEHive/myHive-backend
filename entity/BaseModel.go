@@ -13,6 +13,7 @@ import (
 var logger = util.GetLogger("entity")
 
 type UnixTime time.Time
+type EntityIDType int64
 
 func (t UnixTime) MarshalJSON() ([]byte, error) {
 	stamp := fmt.Sprintf("%d", time.Time(t).UTC().Unix())
@@ -48,9 +49,9 @@ func (t *UnixTime) Scan(src interface{}) error {
 }
 
 type BaseModel struct {
-	Id        int64    `gorm:"primary_key"json:"id"`
-	CreatedAt UnixTime `gorm:"type:timestamp"json:"createdAt"`
-	UpdatedAt UnixTime `gorm:"type:timestamp"json:"updatedAt"`
+	Id        EntityIDType `gorm:"primary_key"json:"id"`
+	CreatedAt UnixTime     `gorm:"type:timestamp"json:"createdAt"`
+	UpdatedAt UnixTime     `gorm:"type:timestamp"json:"updatedAt"`
 }
 
 func (m *BaseModel) BeforeCreate(scope *gorm.Scope) (err error) {
