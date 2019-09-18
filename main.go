@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ECEHive/myHive-backend/db"
 	"github.com/ECEHive/myHive-backend/model"
 	"github.com/ECEHive/myHive-backend/util"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,8 @@ func main() {
 	if e != nil {
 		logger.Warning(".env file not existing or bad format", e)
 	}
+	// Connect to DB
+	_ = db.GetDB()
 
 	// Gin Setup
 	r := gin.New()

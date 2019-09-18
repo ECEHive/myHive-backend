@@ -5,6 +5,7 @@ import (
 	"github.com/ECEHive/myHive-backend/util"
 	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 	"os"
 )
