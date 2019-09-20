@@ -1,5 +1,6 @@
 package util
 
 const (
-	EC_NOT_FOUND = "EC_NOT_FOUND"
+	EC_NOT_FOUND            = "EC_NOT_FOUND"
+	EC_INVALID_REQUEST_BODY = "EC_INVALID_REQUEST_BODY"
 )

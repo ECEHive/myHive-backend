@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/ECEHive/myHive-backend/controller"
 	"github.com/ECEHive/myHive-backend/db"
 	"github.com/ECEHive/myHive-backend/entity"
+	"github.com/ECEHive/myHive-backend/middleware"
 	"github.com/ECEHive/myHive-backend/model"
 	"github.com/ECEHive/myHive-backend/util"
 	"github.com/gin-gonic/gin"
@@ -27,13 +29,13 @@ func main() {
 
 	// Gin Setup
 	r := gin.New()
+	r.Use(gin.Recovery())
+	r.Use(middleware.ErrorHandler) // Handle ctx.error
 
 	// Logging Setup
 	httpLogger := util.GetLogger("Gin")
 	gin.DefaultWriter = httpLogger.WriterLevel(logrus.InfoLevel)
 	gin.DefaultErrorWriter = httpLogger.WriterLevel(logrus.ErrorLevel)
-	r.Use(gin.Recovery())
-	//r.Use(middleware.ErrorHandler)
 	r.Use(func(ctx *gin.Context) {
 		start := time.Now()
 		ctx.Next()
@@ -53,7 +55,11 @@ func main() {
 				method, path, responseStatus, clientIP, execDuration.Seconds()*1000)
 	})
 
+	// Setup low priority middlewares
+	r.Use(middleware.PaginationResolver) // This resolves pagination
+
 	// Setup Routes
+	controller.ConfigureUserController(r.Group("/user"))
 
 	// Setup 404 - No Route
 	r.NoRoute(func(c *gin.Context) {
