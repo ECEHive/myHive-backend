@@ -50,8 +50,8 @@ func (t *UnixTime) Scan(src interface{}) error {
 
 type BaseModel struct {
 	Id        EntityIDType `gorm:"primary_key"json:"id"`
-	CreatedAt UnixTime     `gorm:"type:timestamp"json:"createdAt"`
-	UpdatedAt UnixTime     `gorm:"type:timestamp"json:"updatedAt"`
+	CreatedAt *UnixTime    `gorm:"type:timestamp"json:"createdAt"`
+	UpdatedAt *UnixTime    `gorm:"type:timestamp"json:"updatedAt"`
 }
 
 func (m *BaseModel) BeforeCreate(scope *gorm.Scope) (err error) {
