@@ -12,7 +12,7 @@ var userServiceLogger = util.GetLogger("user_service")
 
 func HiveUserQueryWithPaginationOptions(userQuery *entity.HiveUser, page *model.PaginationRequest) (result []*entity.HiveUser, pageInfo *model.PaginationInformation) {
 	result = []*entity.HiveUser{}
-	query := db.GetDB().Where(userQuery)
+	query := db.GetDB().Model(&entity.HiveUser{}).Where(userQuery)
 	var count int64 = 0
 	query.Count(&count)
 	pageInfo = model.ComputePaginationInformation(page.Page, page.PageSize, count)
