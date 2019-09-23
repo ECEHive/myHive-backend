@@ -17,10 +17,10 @@ type HiveUser struct {
 	Alias      *string
 
 	// Contacts
-	GTEmail       string `gorm:"unique;"`
-	PersonalEmail string `gorm:"unique;"`
-	Phone         string `gorm:"unique;"`
-	GTUsername    string `gorm:"unique;"`
+	GTEmail       *string `gorm:"unique;"`
+	PersonalEmail *string `gorm:"unique;"`
+	Phone         *string `gorm:"unique;"`
+	GTUsername    *string `gorm:"unique;"`
 
 	HiveUserType int // Described in the enum (const group) above
 }
