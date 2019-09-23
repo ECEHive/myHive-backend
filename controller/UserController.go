@@ -52,7 +52,11 @@ func handlerUserUpsert(c *gin.Context) {
 		Find(currentModel).Error; err != nil {
 		logger.Infof("Upsert user is creating user with identification %s", request.UniqueIdentifier)
 		currentModel.UniqueIdentifier = request.UniqueIdentifier
-		conn.Save(currentModel)
+		if err := conn.Save(currentModel).Error; err != nil {
+			logger.Error("Error while inserting record %+v", err)
+			c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err, "unknown error"))
+			return
+		}
 	}
 	service.UpdateModel(currentModel, request.Patch, c)
 	c.JSON(http.StatusOK, model.DataObject(currentModel, nil))

@@ -71,7 +71,7 @@ func main() {
 		port = "9000"
 	}
 
-	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
+	if err := r.Run(fmt.Sprintf("0.0.0.0:%s", port)); err != nil {
 		logger.Error("error running the server", err)
 	} // listen and serve on :port
 }
