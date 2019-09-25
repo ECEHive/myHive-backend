@@ -13,9 +13,14 @@ import (
 func ConfigureUserController(r *gin.RouterGroup) {
 	r.POST("/find", handlerUserLookup)
 	r.PUT("/upsert", handlerUserUpsert)
+	r.GET("/enum/types", handlerUserEnumTypes)
 }
 
 var userControllerLogger = util.GetLogger("user_controller")
+
+func handlerUserEnumTypes(c *gin.Context) {
+	c.JSON(http.StatusOK, model.DataObject(entity.HiveUserTypes))
+}
 
 func handlerUserLookup(c *gin.Context) {
 	request := &entity.HiveUser{}

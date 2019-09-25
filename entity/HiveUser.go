@@ -3,7 +3,14 @@ package entity
 const (
 	HiveUserType_EndUser = iota
 	HiveUserType_PI
+	HiveUserType_Staff
 )
+
+var HiveUserTypes = map[int]string{
+	HiveUserType_EndUser: "End User",
+	HiveUserType_PI:      "Peer Instructor",
+	HiveUserType_Staff:   "Staff",
+}
 
 type HiveUser struct {
 	BaseModel
