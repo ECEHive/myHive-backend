@@ -30,6 +30,7 @@ func handlerUserLookup(c *gin.Context) {
 	users, pagination := service.HiveUserQueryWithPaginationOptions(request, &paginationRequest)
 	if users != nil && pagination != nil {
 		c.JSON(http.StatusOK, model.DataObject(users, pagination))
+		return
 	}
 	c.AbortWithStatus(http.StatusInternalServerError)
 }
