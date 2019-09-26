@@ -10,8 +10,9 @@ type Workbench struct {
 
 type WorkbenchItem struct {
 	BaseModel
-	Name          string
-	InventoryLink *InventoryItemClass
+	Name            string
+	InventoryLinkID EntityIDType
+	InventoryLink   *InventoryItemClass
 }
 
 const (
