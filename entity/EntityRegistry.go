@@ -10,7 +10,9 @@ func MigrateEntities() {
 		WorkbenchRentalRecord{},
 		// Inventory
 		InventoryItemClass{},
+		InventoryItem{},
 		// User & Accounts
 		HiveUser{},
+		Sequence{},
 	)
 }

@@ -61,6 +61,7 @@ func main() {
 	// Setup Routes
 	controller.ConfigureUserController(r.Group("/user"))
 	controller.ConfigureWorkbenchRoutes(r.Group("/workbench"))
+	controller.ConfigureInventoryRouter(r.Group("/inventory"))
 
 	// Setup 404 - No Route
 	r.NoRoute(func(c *gin.Context) {
