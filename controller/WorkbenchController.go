@@ -12,7 +12,6 @@ import (
 func ConfigureWorkbenchRoutes(r *gin.RouterGroup) {
 	r.GET("/list", handlerWorkbenchList)
 	r.POST("/create", handlerWorkbenchCreate)
-
 	r.GET("/enum/record_types", handlerWorkbenchEnumRecordTypes)
 }
 

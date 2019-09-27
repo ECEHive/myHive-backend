@@ -12,6 +12,9 @@ import (
 
 var inventoryServiceLogger = util.GetLogger("inventory-service")
 
+func InventoryItemClassFind(findRequest *model.InventoryItemClassSearchRequest) {
+}
+
 func InventoryItemClassList(paginationRequest *model.PaginationRequest, ctx *gin.Context) ([]*entity.InventoryItemClass, *model.PaginationInformation, error) {
 	var logger = util.LocalLogger(inventoryServiceLogger, ctx)
 
@@ -42,29 +45,33 @@ func InventoryClassUpsert(patchSet *entity.InventoryItemClass, c *gin.Context) (
 	var logger = util.LocalLogger(inventoryServiceLogger, c)
 
 	patchId := patchSet.Id
-	patchSet.Id = 0
-
-	finalModel := entity.InventoryItemClass{}
 	conn := db.GetDB()
-	if err := conn.Where("id = ?", patchId).Find(&finalModel).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
-			// Create Model
-			nextSequence := SequenceIncrementAndGet(util.SequenceInventoryItemLabelId)
-			if nextSequence <= 0 {
-				logger.Panicf("Sequence(%s) encountered negative value: %d", util.SequenceInventoryItemLabelId,
-					nextSequence)
-			}
-			id := fmt.Sprintf("ICLS%04d", nextSequence)
-			patchSet.ItemLabelID = id
-			if err := conn.Save(patchSet).Error; err != nil {
-				logger.Errorf("Error Saving: %+v", err)
+	finalModel := entity.InventoryItemClass{}
+	if patchId != 0 {
+		if err := conn.Where("id = ?", patchId).Find(&finalModel).Error; err != nil {
+			if gorm.IsRecordNotFoundError(err) {
+				logger.Warnf("Unable to find HiveInventoryItemClass with id = %d", patchId)
+				return nil, err
+			} else {
+				logger.Errorf("DB Error: %+v", err)
 				return nil, err
 			}
-			return patchSet, nil
-		} else {
-			logger.Errorf("DB Error: %+v", err)
+		}
+		patchSet.Id = 0
+	} else {
+		// Create Model
+		nextSequence := SequenceIncrementAndGet(util.SequenceInventoryItemLabelId)
+		if nextSequence <= 0 {
+			logger.Panicf("Sequence(%s) encountered negative value: %d", util.SequenceInventoryItemLabelId,
+				nextSequence)
+		}
+		id := fmt.Sprintf("ICLS%04d", nextSequence)
+		patchSet.ItemLabelID = id
+		if err := conn.Save(*patchSet).Error; err != nil {
+			logger.Errorf("Error Saving: %+v", err)
 			return nil, err
 		}
+		return patchSet, nil
 	}
 
 	// Filter not patchable section of the model

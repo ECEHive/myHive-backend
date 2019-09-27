@@ -1,5 +1,17 @@
 package entity
 
+const (
+	CountingType_Estimate = iota
+	CountintType_Exact
+	CountingType_Instance
+)
+
+var InventoryClassCountingTypes = map[int]string{
+	CountingType_Estimate: "Estimate",
+	CountintType_Exact:    "Exact Number",
+	CountingType_Instance: "Instance",
+}
+
 type InventoryItemClass struct {
 	BaseModel
 	ItemName         *string `gorm:"NOT NULL"`
