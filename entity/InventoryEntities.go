@@ -24,6 +24,7 @@ type InventoryItemClass struct {
 	ItemDatasheet    string // URL for datasheet
 	ItemCheckoutMode int    // FreeToTake, Lending, NonCheckout
 	ItemParameters   string // DIP8... etc
+	ItemLocation     string
 
 	ItemInstances []*InventoryItem `gorm:"foreignkey:item_class_id"json:"-"`
 }
