@@ -12,6 +12,18 @@ var InventoryClassCountingTypes = map[int]string{
 	CountingType_Instance: "Instance",
 }
 
+const (
+	CheckoutMode_FreeToTake = iota
+	CheckoutMode_Checkout
+	CheckoutMode_NoCheckout
+)
+
+var InventoryClassCheckoutModes = map[int]string{
+	CheckoutMode_FreeToTake: "Free To Take",
+	CheckoutMode_Checkout:   "Checkout Required",
+	CheckoutMode_NoCheckout: "Checkout Not Allowed",
+}
+
 type InventoryItemClass struct {
 	BaseModel
 	ItemName         *string `gorm:"NOT NULL"`

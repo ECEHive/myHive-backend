@@ -17,6 +17,7 @@ func ConfigureInventoryRouter(r *gin.RouterGroup) {
 
 	// Enum Types
 	r.GET("/class/enum/count_types", handlerInventoryClassEnumCountTypes)
+	r.GET("/class/enum/checkout_modes", handlerInventoryClassCheckoutModes)
 }
 
 func handlerInventoryClassFind(c *gin.Context) {
@@ -27,6 +28,10 @@ func handlerInventoryClassFind(c *gin.Context) {
 		return
 	}
 
+}
+
+func handlerInventoryClassCheckoutModes(c *gin.Context) {
+	c.JSON(http.StatusOK, model.DataObject(entity.InventoryClassCheckoutModes))
 }
 
 func handlerInventoryClassEnumCountTypes(c *gin.Context) {
