@@ -33,7 +33,7 @@ func InventoryItemClassList(paginationRequest *model.PaginationRequest, ctx *gin
 	if err := conn.
 		Limit(pagination.PageSize).
 		Order("id ASC").
-		Offset(pagination.CurrentPage & pagination.PageSize).
+		Offset(pagination.CurrentPage * pagination.PageSize).
 		Find(&queryResult).Error; err != nil {
 		if !gorm.IsRecordNotFoundError(err) {
 			logger.Errorf("Error while querying DB: %+v", err)
