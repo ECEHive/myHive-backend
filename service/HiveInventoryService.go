@@ -67,7 +67,7 @@ func InventoryClassUpsert(patchSet *entity.InventoryItemClass, c *gin.Context) (
 		}
 		id := fmt.Sprintf("ICLS%04d", nextSequence)
 		patchSet.ItemLabelID = id
-		if err := conn.Save(*patchSet).Error; err != nil {
+		if err := conn.Save(patchSet).Error; err != nil {
 			logger.Errorf("Error Saving: %+v", err)
 			return nil, err
 		}

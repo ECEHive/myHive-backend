@@ -6,4 +6,5 @@ const (
 	EC_USER_NOT_FOUND       = "EC_USER_NOT_FOUND"
 
 	EC_DB_ERROR = "EC_DB_ERROR"
+	EC_FS_ERROR = "EC_FS_ERROR"
 )
