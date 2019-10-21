@@ -18,6 +18,7 @@ func InventoryItemClassFind(findRequest *model.InventoryItemClassSearchRequest) 
 func InventoryItemClassList(paginationRequest *model.PaginationRequest, ctx *gin.Context) ([]*entity.InventoryItemClass, *model.PaginationInformation, error) {
 	var logger = util.LocalLogger(inventoryServiceLogger, ctx)
 
+	logger.Infof("IC Listing with pagination %+v", paginationRequest)
 	conn := db.GetDB()
 
 	var count int64
@@ -29,10 +30,11 @@ func InventoryItemClassList(paginationRequest *model.PaginationRequest, ctx *gin
 	}
 	pagination := model.ComputePaginationInformation(paginationRequest.Page, paginationRequest.PageSize, count)
 
-	if err := conn.Find(&queryResult).
+	if err := conn.
 		Limit(pagination.PageSize).
 		Order("id ASC").
-		Offset(pagination.CurrentPage).Error; err != nil {
+		Offset(pagination.CurrentPage & pagination.PageSize).
+		Find(&queryResult).Error; err != nil {
 		if !gorm.IsRecordNotFoundError(err) {
 			logger.Errorf("Error while querying DB: %+v", err)
 			return nil, nil, err
