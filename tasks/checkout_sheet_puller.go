@@ -97,7 +97,6 @@ func Sync_sheet() {
 	if len(resp.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
-		fmt.Println("Name, Major:")
 		for i, row := range resp.Values {
 			if row[0] == "" {
 				continue
@@ -108,8 +107,8 @@ func Sync_sheet() {
 			email := row[3].(string)
 			item := row[5].(string)
 			returntime, _ := time.Parse("1/2/2006 MST", row[8].(string)+" EST")
-			is_returned := row[15].(string) == "TRUE"
-			fmt.Printf("%d: [TIME: %v] [Name: %v] [Email: %v] [Item: %v] [Return: %v] [Returned: %v]\n", i, checkoutTime, name, email, item, returntime, is_returned)
+			isReturned := row[15].(string) == "TRUE"
+			fmt.Printf("%d: [TIME: %v] [Name: %v] [Email: %v] [Item: %v] [Return: %v] [Returned: %v]\n", i, checkoutTime, name, email, item, returntime, isReturned)
 		}
 	}
 }
