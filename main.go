@@ -7,8 +7,10 @@ import (
 	"github.com/ECEHive/myHive-backend/entity"
 	"github.com/ECEHive/myHive-backend/middleware"
 	"github.com/ECEHive/myHive-backend/model"
+	"github.com/ECEHive/myHive-backend/tasks"
 	"github.com/ECEHive/myHive-backend/util"
 	"github.com/gin-gonic/gin"
+	"github.com/jasonlvhit/gocron"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -26,6 +28,9 @@ func main() {
 	_ = db.GetDB()
 	// DB: Migrate Entities
 	entity.MigrateEntities()
+
+	tasks.Sync_sheet()
+	return
 
 	// Gin Setup
 	r := gin.New()
@@ -67,6 +72,12 @@ func main() {
 	r.NoRoute(func(c *gin.Context) {
 		c.Set("error", model.NotFound(fmt.Sprintf("route '%s' has no matching handler", c.Request.URL.Path)))
 	})
+
+	// Setup Scheduler
+	gocron.Every(1).Second().Do(func() {
+		fmt.Println("LMAO")
+	})
+	go func() { <-gocron.Start() }()
 
 	port := os.Getenv("serverport")
 	if port == "" {
