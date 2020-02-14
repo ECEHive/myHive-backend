@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ECEHive/myHive-backend/db"
+	"github.com/ECEHive/myHive-backend/entity"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/sheets/v4"
@@ -19,7 +21,7 @@ func getClient(config *oauth2.Config) *http.Client {
 	// The file token.json stores the user's access and refresh tokens, and is
 	// created automatically when the authorization flow completes for the first
 	// time.
-	tokFile := "token.json"
+	tokFile := "/credentials/google_token.json"
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {
 		tok = getTokenFromWeb(config)
@@ -70,7 +72,7 @@ func saveToken(path string, token *oauth2.Token) {
 }
 
 func Sync_sheet() {
-	b, err := ioutil.ReadFile("/home/codetector/Downloads/credentials.json")
+	b, err := ioutil.ReadFile("/credentials/google.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
@@ -87,8 +89,9 @@ func Sync_sheet() {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	spreadsheetId := "1lU2_7Yi3y7FgWY1V6PvW82_05vtdZxWo9nObZ4EgzT0"
-	readRange := "Checkout 2020-2021!A2:Q"
+	spreadsheetId := "1zgav_Eu4FZSeuKMMcjU3e9eraKd_2oQnxXyeTLZ3oY0"
+	readRange := "Form Responses!A2:H"
+
 	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
 	if err != nil {
 		log.Fatalf("Unable to retrieve data from sheet: %v", err)
@@ -97,6 +100,7 @@ func Sync_sheet() {
 	if len(resp.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
+		dbc := db.GetDB()
 		for i, row := range resp.Values {
 			if row[0] == "" {
 				continue
@@ -106,9 +110,15 @@ func Sync_sheet() {
 			name := row[1].(string) + " " + row[2].(string)
 			email := row[3].(string)
 			item := row[5].(string)
-			returntime, _ := time.Parse("1/2/2006 MST", row[8].(string)+" EST")
-			isReturned := row[15].(string) == "TRUE"
-			fmt.Printf("%d: [TIME: %v] [Name: %v] [Email: %v] [Item: %v] [Return: %v] [Returned: %v]\n", i, checkoutTime, name, email, item, returntime, isReturned)
+			piName := row[7].(string)
+			dbc.Save(&entity.InventoryCheckoutRecord{
+				SheetRow:     uint(i),
+				Name:         name,
+				Email:        email,
+				Item:         item,
+				CheckoutPI:   piName,
+				CheckoutDate: entity.UnixTime(checkoutTime),
+			})
 		}
 	}
 }

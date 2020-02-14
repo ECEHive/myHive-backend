@@ -29,9 +29,6 @@ func main() {
 	// DB: Migrate Entities
 	entity.MigrateEntities()
 
-	tasks.Sync_sheet()
-	return
-
 	// Gin Setup
 	r := gin.New()
 	r.Use(gin.Recovery())
@@ -74,10 +71,11 @@ func main() {
 	})
 
 	// Setup Scheduler
-	gocron.Every(1).Second().Do(func() {
-		fmt.Println("LMAO")
+	gocron.Every(1).Minute().Do(func() {
+		tasks.Sync_sheet()
 	})
 	go func() { <-gocron.Start() }()
+	gocron.RunAll()
 
 	port := os.Getenv("serverport")
 	if port == "" {

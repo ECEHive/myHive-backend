@@ -3,6 +3,7 @@ package controller
 import (
 	"bufio"
 	"encoding/csv"
+	"github.com/ECEHive/myHive-backend/db"
 	"github.com/ECEHive/myHive-backend/entity"
 	"github.com/ECEHive/myHive-backend/model"
 	"github.com/ECEHive/myHive-backend/service"
@@ -21,6 +22,8 @@ func ConfigureInventoryRouter(r *gin.RouterGroup) {
 	r.PUT("/class/upsert", handlerInventoryClassUpsert)
 	r.GET("/class/find", handlerInventoryClassFind)
 	r.POST("/class/import", handlerInventoryClassImport)
+
+	r.GET("/checkout/record/list", handlerInventoryCheckoutRecords)
 
 	// Enum Types
 	r.GET("/class/enum/count_types", handlerInventoryClassEnumCountTypes)
@@ -149,4 +152,14 @@ func handlerInventoryClassList(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, model.DataObject(result, pagination))
 	}
+}
+
+func handlerInventoryCheckoutRecords(c *gin.Context) {
+	var all []*entity.InventoryCheckoutRecord
+	if e := db.GetDB().Select(&all).Error; e != nil {
+		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, e, "Internal DB Error while Querying"))
+		return
+	}
+	c.JSON(http.StatusOK, model.DataObject(all))
+
 }
