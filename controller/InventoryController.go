@@ -41,7 +41,8 @@ var inventoryLogger = util.GetLogger("inventory-controller")
 func handlerInventoryCheckoutNew(c *gin.Context) {
 	var data model.InventoryCheckoutNewRequest
 	if err := c.BindJSON(&data); err != nil {
-		c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY, err, "Malformed Request"+err.Error()))
+		c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY,
+			err, "Malformed Request"+err.Error()))
 		return
 	}
 	conn := db.GetDB()
@@ -54,7 +55,8 @@ func handlerInventoryCheckoutNew(c *gin.Context) {
 		CheckoutPI:   data.CheckoutPI,
 	}
 	if err := conn.Save(&obj).Error; err != nil {
-		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err, "something went wrong"))
+		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
+			"something went wrong"))
 		return
 	}
 	c.JSON(http.StatusOK, model.DataObject(obj))
@@ -64,7 +66,8 @@ func handlerInventoryCheckoutItems(c *gin.Context) {
 	var values []*entity.InventoryCheckoutItem
 	conn := db.GetDB()
 	if err := conn.Find(&values).Error; err != nil {
-		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err, "Something went wrong"))
+		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
+			"Something went wrong"))
 		return
 	}
 	c.JSON(http.StatusOK, model.DataObject(values))
@@ -74,11 +77,13 @@ func handlerInventoryClassImport(c *gin.Context) {
 	var filename string
 	logger := util.LocalLogger(inventoryLogger, c)
 	if file, err := c.FormFile("file"); err != nil {
-		c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY, err, "Missing form field: file"))
+		c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY, err,
+			"Missing form field: file"))
 		return
 	} else {
 		if tempFile, err := ioutil.TempFile("", "hive_inventory_upload"); err != nil {
-			c.Set("error", model.InternalServerError(util.EC_FS_ERROR, err, "failed to create tmp file"))
+			c.Set("error", model.InternalServerError(util.EC_FS_ERROR, err,
+				"failed to create tmp file"))
 			return
 		} else {
 			filename = tempFile.Name()
@@ -96,7 +101,8 @@ func handlerInventoryClassImport(c *gin.Context) {
 		if readerr == io.EOF {
 			break
 		} else if readerr != nil {
-			c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY, readerr, "Bad file format"))
+			c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY, readerr,
+				"Bad file format"))
 			return
 		} else {
 			if !skip {
@@ -172,9 +178,11 @@ func handlerInventoryClassUpsert(c *gin.Context) {
 
 	if result, err := service.InventoryClassUpsert(patchModel, c); err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			c.Set("error", model.BadRequest(util.EC_NOT_FOUND, err, "Can not patch item that does not exist"))
+			c.Set("error", model.BadRequest(util.EC_NOT_FOUND, err,
+				"Can not patch item that does not exist"))
 		} else {
-			c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err, "Error while saving changes"))
+			c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
+				"Error while saving changes"))
 		}
 		return
 	} else {
@@ -185,7 +193,8 @@ func handlerInventoryClassUpsert(c *gin.Context) {
 func handlerInventoryClassList(c *gin.Context) {
 	paginationRequest := c.MustGet("pagination").(model.PaginationRequest) // Get pagination
 	if result, pagination, err := service.InventoryItemClassList(&paginationRequest, c); err != nil {
-		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err, "Something went wrong while querying"))
+		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
+			"Something went wrong while querying"))
 		return
 	} else {
 		c.JSON(http.StatusOK, model.DataObject(result, pagination))
@@ -195,7 +204,8 @@ func handlerInventoryClassList(c *gin.Context) {
 func handlerInventoryCheckoutRecords(c *gin.Context) {
 	var all []*entity.InventoryCheckoutRecord
 	if e := db.GetDB().Select(&all).Error; e != nil {
-		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, e, "Internal DB Error while Querying"))
+		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, e,
+			"Internal DB Error while Querying"))
 		return
 	}
 	c.JSON(http.StatusOK, model.DataObject(all))
