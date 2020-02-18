@@ -2,9 +2,9 @@ package entity
 
 type InventoryCheckoutRecord struct {
 	BaseModel
-	SheetRow uint `gorm:"unique"`
-	Name     string
-	Email    string
+	FirstName string
+	LastName  string
+	Email     string
 
 	Item         string
 	CheckoutDate UnixTime `gorm:"type:timestamp"`
@@ -12,4 +12,9 @@ type InventoryCheckoutRecord struct {
 	CheckoutPI   string
 
 	LastEmail *UnixTime
+}
+
+type InventoryCheckoutItem struct {
+	Id       int `gorm:"primary_key"`
+	ItemName string
 }

@@ -15,5 +15,6 @@ func MigrateEntities() {
 		HiveUser{},
 		Sequence{},
 		InventoryCheckoutRecord{},
+		InventoryCheckoutItem{},
 	)
 }

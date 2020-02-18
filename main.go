@@ -7,10 +7,8 @@ import (
 	"github.com/ECEHive/myHive-backend/entity"
 	"github.com/ECEHive/myHive-backend/middleware"
 	"github.com/ECEHive/myHive-backend/model"
-	"github.com/ECEHive/myHive-backend/tasks"
 	"github.com/ECEHive/myHive-backend/util"
 	"github.com/gin-gonic/gin"
-	"github.com/jasonlvhit/gocron"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -61,6 +59,11 @@ func main() {
 	r.Use(middleware.PaginationResolver) // This resolves pagination
 
 	// Setup Routes
+
+	// Configure Production Routes
+	v1Routes := r.Group("/v1")
+	controller.ConfigureV1InventoryRouter(v1Routes.Group("/inventory"))
+
 	controller.ConfigureUserController(r.Group("/user"))
 	controller.ConfigureWorkbenchRoutes(r.Group("/workbench"))
 	controller.ConfigureInventoryRouter(r.Group("/inventory"))
@@ -71,11 +74,11 @@ func main() {
 	})
 
 	// Setup Scheduler
-	gocron.Every(1).Minute().Do(func() {
-		tasks.Sync_sheet()
-	})
-	go func() { <-gocron.Start() }()
-	gocron.RunAll()
+	//gocron.Every(1).Minute().Do(func() {
+	//	tasks.Sync_sheet()
+	//})
+	//go func() { <-gocron.Start() }()
+	//gocron.RunAll()
 
 	port := os.Getenv("serverport")
 	if port == "" {

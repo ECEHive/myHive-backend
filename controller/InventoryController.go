@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 func ConfigureInventoryRouter(r *gin.RouterGroup) {
@@ -30,7 +31,44 @@ func ConfigureInventoryRouter(r *gin.RouterGroup) {
 	r.GET("/class/enum/checkout_modes", handlerInventoryClassCheckoutModes)
 }
 
+func ConfigureV1InventoryRouter(r *gin.RouterGroup) {
+	r.POST("/checkout/new", handlerInventoryCheckoutNew)
+	r.GET("/checkout/items", handlerInventoryCheckoutItems)
+}
+
 var inventoryLogger = util.GetLogger("inventory-controller")
+
+func handlerInventoryCheckoutNew(c *gin.Context) {
+	var data model.InventoryCheckoutNewRequest
+	if err := c.BindJSON(&data); err != nil {
+		c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY, err, "Malformed Request"+err.Error()))
+		return
+	}
+	conn := db.GetDB()
+	obj := entity.InventoryCheckoutRecord{
+		Item:         data.Item,
+		FirstName:    data.FirstName,
+		LastName:     data.LastName,
+		Email:        data.Email,
+		CheckoutDate: entity.UnixTime(time.Now()),
+		CheckoutPI:   data.CheckoutPI,
+	}
+	if err := conn.Save(&obj).Error; err != nil {
+		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err, "something went wrong"))
+		return
+	}
+	c.JSON(http.StatusOK, model.DataObject(obj))
+}
+
+func handlerInventoryCheckoutItems(c *gin.Context) {
+	var values []*entity.InventoryCheckoutItem
+	conn := db.GetDB()
+	if err := conn.Find(&values).Error; err != nil {
+		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err, "Something went wrong"))
+		return
+	}
+	c.JSON(http.StatusOK, model.DataObject(values))
+}
 
 func handlerInventoryClassImport(c *gin.Context) {
 	var filename string
