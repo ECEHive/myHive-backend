@@ -3,6 +3,7 @@ package controller
 import (
 	"bufio"
 	"encoding/csv"
+	"fmt"
 	"github.com/ECEHive/myHive-backend/db"
 	"github.com/ECEHive/myHive-backend/entity"
 	"github.com/ECEHive/myHive-backend/model"
@@ -33,10 +34,32 @@ func ConfigureInventoryRouter(r *gin.RouterGroup) {
 
 func ConfigureV1InventoryRouter(r *gin.RouterGroup) {
 	r.POST("/checkout/new", handlerInventoryCheckoutNew)
+	r.GET("/checkout/list", handlerInventoryCheckoutList)
 	r.GET("/checkout/items", handlerInventoryCheckoutItems)
 }
 
 var inventoryLogger = util.GetLogger("inventory-controller")
+
+func handlerInventoryCheckoutList(c *gin.Context) {
+	var values []*entity.InventoryCheckoutRecord
+	conn := db.GetDB()
+	q := conn
+	statusQuery := c.Query("status")
+	if len(statusQuery) > 0 {
+		q = q.Where("status = ?", statusQuery)
+	}
+	nameQuery := c.Query("name")
+	if len(nameQuery) > 0 {
+		nameQuery = fmt.Sprintf("%%%s%%", nameQuery)
+		q = q.Where("first_name LIKE ?", nameQuery).Or("last_name LIKE ?", nameQuery)
+	}
+	if err := q.Find(&values).Error; err != nil {
+		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
+			"Something went wrong"))
+		return
+	}
+	c.JSON(http.StatusOK, model.DataObject(values))
+}
 
 func handlerInventoryCheckoutNew(c *gin.Context) {
 	var data model.InventoryCheckoutNewRequest
@@ -53,6 +76,7 @@ func handlerInventoryCheckoutNew(c *gin.Context) {
 		Email:        data.Email,
 		CheckoutDate: entity.UnixTime(time.Now()),
 		CheckoutPI:   data.CheckoutPI,
+		Status:       entity.InventoryCheckoutStatusCheckedOut,
 	}
 	if err := conn.Save(&obj).Error; err != nil {
 		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
@@ -65,7 +89,8 @@ func handlerInventoryCheckoutNew(c *gin.Context) {
 func handlerInventoryCheckoutItems(c *gin.Context) {
 	var values []*entity.InventoryCheckoutItem
 	conn := db.GetDB()
-	if err := conn.Find(&values).Error; err != nil {
+	q := conn.Select(&entity.InventoryCheckoutItem{})
+	if err := q.Find(&values).Error; err != nil {
 		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
 			"Something went wrong"))
 		return

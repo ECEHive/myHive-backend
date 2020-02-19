@@ -1,5 +1,14 @@
 package entity
 
+type InventoryCheckoutStatus string
+
+const (
+	InventoryCheckoutStatusCheckedOut   InventoryCheckoutStatus = "CheckedOut"
+	InventoryCheckoutStatusExtended     InventoryCheckoutStatus = "Extended"
+	InventoryCheckoutStatusReturned     InventoryCheckoutStatus = "Returned"
+	InventoryCheckoutStatusLostOrDamage InventoryCheckoutStatus = "LostOrDamage"
+)
+
 type InventoryCheckoutRecord struct {
 	BaseModel
 	FirstName string
@@ -8,7 +17,7 @@ type InventoryCheckoutRecord struct {
 
 	Item         string
 	CheckoutDate UnixTime `gorm:"type:timestamp"`
-	Returned     bool
+	Status       InventoryCheckoutStatus
 	CheckoutPI   string
 
 	LastEmail *UnixTime
