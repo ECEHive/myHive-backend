@@ -89,7 +89,7 @@ func handlerInventoryCheckoutNew(c *gin.Context) {
 func handlerInventoryCheckoutItems(c *gin.Context) {
 	var values []*entity.InventoryCheckoutItem
 	conn := db.GetDB()
-	q := conn.Select(&entity.InventoryCheckoutItem{})
+	q := conn
 	if err := q.Find(&values).Error; err != nil {
 		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
 			"Something went wrong"))
