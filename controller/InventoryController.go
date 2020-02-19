@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"github.com/ECEHive/myHive-backend/constants"
 	"github.com/ECEHive/myHive-backend/db"
 	"github.com/ECEHive/myHive-backend/entity"
 	"github.com/ECEHive/myHive-backend/model"
@@ -34,11 +35,16 @@ func ConfigureInventoryRouter(r *gin.RouterGroup) {
 
 func ConfigureV1InventoryRouter(r *gin.RouterGroup) {
 	r.POST("/checkout/new", handlerInventoryCheckoutNew)
+	r.POST("/checkout/update", handlerInventoryCheckoutUpdate)
 	r.GET("/checkout/list", handlerInventoryCheckoutList)
 	r.GET("/checkout/items", handlerInventoryCheckoutItems)
 }
 
 var inventoryLogger = util.GetLogger("inventory-controller")
+
+/*
+	Inventory Checkout
+*/
 
 func handlerInventoryCheckoutList(c *gin.Context) {
 	var values []*entity.InventoryCheckoutRecord
@@ -76,7 +82,7 @@ func handlerInventoryCheckoutNew(c *gin.Context) {
 		Email:        data.Email,
 		CheckoutDate: entity.UnixTime(time.Now()),
 		CheckoutPI:   data.CheckoutPI,
-		Status:       entity.InventoryCheckoutStatusCheckedOut,
+		Status:       constants.InventoryCheckoutStatusCheckedOut,
 	}
 	if err := conn.Save(&obj).Error; err != nil {
 		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
@@ -84,6 +90,38 @@ func handlerInventoryCheckoutNew(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, model.DataObject(obj))
+}
+
+func handlerInventoryCheckoutUpdate(c *gin.Context) {
+	var requestObj model.InventoryCheckoutUpdateRequest
+	if err := c.ShouldBindJSON(&requestObj); err != nil {
+		c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY, err, err.Error()))
+		return
+	}
+	// Validate the new status is valid
+	if !util.CheckoutStatusInAllStatus(requestObj.NewStatus, constants.InventoryCheckoutStatusAll) {
+		c.Set("error", model.BadRequest(util.EC_INVALID_REQUEST_BODY, nil,
+			fmt.Sprintf("%s is not a valid status for a checkout record",
+				requestObj.NewStatus)))
+		return
+	}
+	conn := db.GetDB()
+	var checkoutEntry entity.InventoryCheckoutRecord
+	if err := conn.Where("id = ?", requestObj.Id).First(&checkoutEntry).Error; err != nil {
+		// Entity Not Found
+		c.Set("error", model.NotFound(fmt.Sprintf("Unable to find request with id %d", requestObj.Id)))
+		return
+	}
+	if checkoutEntry.Status != requestObj.NewStatus &&
+		requestObj.NewStatus != constants.InventoryCheckoutStatusExtended {
+		checkoutEntry.Status = requestObj.NewStatus
+		if err := conn.Save(&checkoutEntry).Error; err != nil {
+			c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
+				"Unexpected internal error while saving"))
+			return
+		}
+	}
+	c.JSON(http.StatusOK, model.DataObject(checkoutEntry))
 }
 
 func handlerInventoryCheckoutItems(c *gin.Context) {
@@ -97,6 +135,10 @@ func handlerInventoryCheckoutItems(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, model.DataObject(values))
 }
+
+/*
+	Inventory Class
+*/
 
 func handlerInventoryClassImport(c *gin.Context) {
 	var filename string

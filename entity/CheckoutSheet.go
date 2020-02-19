@@ -1,13 +1,6 @@
 package entity
 
-type InventoryCheckoutStatus string
-
-const (
-	InventoryCheckoutStatusCheckedOut   InventoryCheckoutStatus = "CheckedOut"
-	InventoryCheckoutStatusExtended     InventoryCheckoutStatus = "Extended"
-	InventoryCheckoutStatusReturned     InventoryCheckoutStatus = "Returned"
-	InventoryCheckoutStatusLostOrDamage InventoryCheckoutStatus = "LostOrDamage"
-)
+import "github.com/ECEHive/myHive-backend/constants"
 
 type InventoryCheckoutRecord struct {
 	BaseModel
@@ -17,7 +10,7 @@ type InventoryCheckoutRecord struct {
 
 	Item         string
 	CheckoutDate UnixTime `gorm:"type:timestamp"`
-	Status       InventoryCheckoutStatus
+	Status       constants.InventoryCheckoutStatus
 	CheckoutPI   string
 
 	LastEmail *UnixTime

@@ -1,5 +1,9 @@
 package model
 
+import (
+	"github.com/ECEHive/myHive-backend/constants"
+)
+
 type InventoryItemClassSearchRequest struct {
 	SearchKeyword string
 	NameOnly      bool
@@ -14,4 +18,10 @@ type InventoryCheckoutNewRequest struct {
 	Email     string `binding:"required"`
 
 	CheckoutPI string `binding:"required"`
+}
+
+type InventoryCheckoutUpdateRequest struct {
+	Id         int                               `binding:"required"`
+	NewStatus  constants.InventoryCheckoutStatus `binding:"required"`
+	CheckoutPI string
 }
