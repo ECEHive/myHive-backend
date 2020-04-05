@@ -15,6 +15,16 @@ var inventoryServiceLogger = util.GetLogger("inventory-service")
 func InventoryItemClassFind(findRequest *model.InventoryItemClassSearchRequest) {
 }
 
+// TODO Replace CheckoutItem with InventoryItem
+func InventoryItemFindById(id int) (*entity.InventoryCheckoutItem, error) {
+	conn := db.GetDB()
+	var item entity.InventoryCheckoutItem
+	if err := conn.Where("id=?", id).Find(&item).Error; err != nil {
+		return nil, err
+	}
+	return &item, nil
+}
+
 func InventoryItemClassList(paginationRequest *model.PaginationRequest, ctx *gin.Context) ([]*entity.InventoryItemClass, *model.PaginationInformation, error) {
 	var logger = util.LocalLogger(inventoryServiceLogger, ctx)
 

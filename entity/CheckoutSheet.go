@@ -8,7 +8,7 @@ type InventoryCheckoutRecord struct {
 	LastName  string
 	Email     string
 
-	Item         string
+	Item         int64
 	CheckoutDate UnixTime `gorm:"type:timestamp"`
 	Status       constants.InventoryCheckoutStatus
 	CheckoutPI   string

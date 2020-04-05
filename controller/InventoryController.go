@@ -74,22 +74,39 @@ func handlerInventoryCheckoutNew(c *gin.Context) {
 			err, "Malformed Request"+err.Error()))
 		return
 	}
+	var items []*entity.InventoryCheckoutItem
+	for _, itemId := range data.Items {
+		if item, err := service.InventoryItemFindById(itemId); err != nil {
+			c.Set("error", model.BadRequest(util.EC_NOT_FOUND, err,
+				fmt.Sprintf("requested item with ID: %d not found", itemId)))
+			return
+		} else {
+			items = append(items, item)
+		}
+	}
 	conn := db.GetDB()
-	obj := entity.InventoryCheckoutRecord{
-		Item:         data.Item,
-		FirstName:    data.FirstName,
-		LastName:     data.LastName,
-		Email:        data.Email,
-		CheckoutDate: entity.UnixTime(time.Now()),
-		CheckoutPI:   data.CheckoutPI,
-		Status:       constants.InventoryCheckoutStatusCheckedOut,
+
+	var objs []entity.InventoryCheckoutRecord
+
+	for _, item := range items {
+		obj := entity.InventoryCheckoutRecord{
+			Item:         int64(item.Id),
+			FirstName:    data.FirstName,
+			LastName:     data.LastName,
+			Email:        data.Email,
+			CheckoutDate: entity.UnixTime(time.Now()),
+			CheckoutPI:   data.CheckoutPI,
+			Status:       constants.InventoryCheckoutStatusCheckedOut,
+		}
+		if err := conn.Save(&obj).Error; err != nil {
+			c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
+				"something went wrong"))
+			return
+		}
+		objs = append(objs, obj)
 	}
-	if err := conn.Save(&obj).Error; err != nil {
-		c.Set("error", model.InternalServerError(util.EC_DB_ERROR, err,
-			"something went wrong"))
-		return
-	}
-	c.JSON(http.StatusOK, model.DataObject(obj))
+
+	c.JSON(http.StatusOK, model.DataObject(objs))
 }
 
 func handlerInventoryCheckoutUpdate(c *gin.Context) {

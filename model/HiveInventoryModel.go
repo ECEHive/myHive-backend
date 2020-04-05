@@ -12,7 +12,8 @@ type InventoryItemClassSearchRequest struct {
 }
 
 type InventoryCheckoutNewRequest struct {
-	Item      string `binding:"required"`
+	//Item      string `binding:"required"`
+	Items     []int  `binding:"required"`
 	FirstName string `binding:"required"`
 	LastName  string `binding:"required"`
 	Email     string `binding:"required"`
